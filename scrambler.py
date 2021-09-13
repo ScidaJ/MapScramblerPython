@@ -1,4 +1,5 @@
 import argparse
+import random
 from os.path import exists
 
 parser = argparse.ArgumentParser()
@@ -11,6 +12,9 @@ parser.add_argument('-v', '--verbose', help='Enables verbose output', action='st
 
 args = parser.parse_args()
 
+maps = {}
+mapList = {}
+
 if not exists(args.MapList):
     print('Your map file ', args.MapFile, ' does not exist.')
 else:
@@ -19,4 +23,13 @@ else:
         print('Your server file', args.ServerFile, 'does not exist. Creating the file now.')
     serverFile = open(args.ServerFile, 'w')
     mapFile = mapFile.split('\n')
-    print(mapFile)
+    size = len(mapFile)
+    for currMap in mapFile:
+        currMap = currMap.split(',')
+        maps[currMap[1]] = currMap[0]
+        index = random.randint(0, size)
+        while index in mapList:
+            index = random.randint(0, size)
+        mapList[index] = currMap[1]
+    print('Maps have been scrambled!')
+
