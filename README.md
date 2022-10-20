@@ -6,4 +6,4 @@ This was written with the [IW4x](https://xlabs.dev/) project in mind. It is a sm
 
 | Argument | Required     | Description                            | Example               |
 | -------- | ------------ | -------------------------------------- | --------------------- |
-| MapFile  | - [x] | Path to the map file. Can be relative. | /c/MW2Server/maps.txt |
+| MapFile  | :heavy_check_mark: | Path to the map file. Can be relative. | /c/MW2Server/maps.txt |
