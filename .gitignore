@@ -132,3 +132,7 @@ dmypy.json
 resources
 .idea
 .DS_Store
+maps.txt
+
+# Specified by developer
+out/*
