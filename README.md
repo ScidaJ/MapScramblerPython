@@ -1,8 +1,11 @@
 # MW2MapScramblerPython
 
+This was written with the [IW4x](https://xlabs.dev/) project in mind. 
 # **DUE TO HOW THIS SCRIPT WORKS, IT IS RECOMMENDED THAT YOU DO THIS ON A COPY OF YOUR SERVER.CFG FILE**
 
-This was written with the [IW4x](https://xlabs.dev/) project in mind. It is a small tool to randomize the map list found in the server settings file. This was very annoying for me to do by hand as it could take upwards of 10 minutes each time. IW4x does not support automatic map list scrambling so I made it myself.
+It is a small tool to randomize the map list found in the server settings file. This was very annoying for me to do by hand as it could take upwards of 10 minutes each time. IW4x does not support automatic map list scrambling so I made it myself.
+
+Before using, please ensure that you have a map list that is in the proper format. There is a properly formatted list in this repository.
 
 ## Arguments
 
@@ -16,3 +19,15 @@ This was written with the [IW4x](https://xlabs.dev/) project in mind. It is a sm
 | `-l`, `--list`   | :x:                | Specifies if you want it output to a list file instead of to your sever.cfg file. Not to be used with `--ServerFile`. Can be used with `--Prefix` and `--PostFix` if desired. Will ignore `--ArgSliceChar` if it is present. **Option is on by default** | N/A                                                                                                                        |
 | `-p`, `--prefix` | :x:                | Prefix for map names if the game requires it(e.g. mp [map name]). Spaces will not be added to the end of this string.                                                                                                                                    | `-p "mp "`                                                                                                                 |
 | `-q`, `--quotes` | :x:                | Encapsulates the map list in quotes.                                                                                                                                                                                                                     | N/A                                                                                                                        |
+
+## Map List Format
+
+If you are making your own map list for this function, here is an example of the proper format for it to work. If you would like to know why the list must be this way then please read on, if not then look at the list below. 
+
+The function stores the map list in two separate dicitonaries. The first, `map_list`, stores the pretty version of the map name(e.g. Afghan, Highrise, etc., etc...) as the key, with the value being the file name of the map file(e.g. mp_afghan, mp_highrise, etc., etc...), and the second, `random_map_list` stores a randomly generated index as the key, and the value is the pretty map name. This is because in Java, which this project was originally written in, dictionary access(O(1)) was significantly faster than array access(O(n)) when working with massive map lists. 
+
+### Example
+
+The `\n` are newlines.
+
+`mp_afghan,Afghan\nmp_derail,Derail\nmp_estate,Estate\nmp_favela,Favela`
