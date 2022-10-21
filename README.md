@@ -34,3 +34,5 @@ The function stores the map list in two separate dicitonaries. The first, `map_l
 The `\n` are newlines.
 
 `mp_afghan,Afghan\nmp_derail,Derail\nmp_estate,Estate\nmp_favela,Favela`
+
+For a more clear example, look at `maps.txt` in the repository.
