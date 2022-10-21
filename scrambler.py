@@ -7,8 +7,9 @@ from pathlib import Path
 from sys import exit
 
 DIR = getcwd()
-MAP_LIST_DIR_PATH = '\out'
-MAP_LIST_PATH = '\maps.txt'
+OUT_DIR_PATH = '\out'
+MAP_LIST_FILE = '\maps.txt'
+SERVER_FILE_COPY = '\server_copy.cfg'
 
 def main(): 
     parser = argparse.ArgumentParser()
@@ -17,6 +18,7 @@ def main():
     parser.add_argument('--PreArg', help='Arguments that go before the map list. Spaces/New lines will not be added to the end.')
     parser.add_argument('--PostArg', help='Arguments that go after the map list. Spaces/New lines will not be added to the front.')
     parser.add_argument('--ArgSliceChar', help='Character to slice the server arguments by. Must be exactly 2 slice characters in server file, One directly before the map list, and one directly after. CANNOT be used with --PreArg or --PostArg.')
+    parser.add_argument('-c', '--copy', help='Saves scrambled server file to a copy instead of overriding given server file. Not to be used with -l.', action='store_true')
     parser.add_argument('-l', '--list', help='Enables output to a seperate list file instead of overwriting server file. Will be placed in \out\map_list.txt. Do not use with --ServerFile', action='store_true')
     parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
     parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
@@ -28,12 +30,13 @@ def main():
 
     maps = {}
     random_map_list = {}
-    final_map_file = None
+    output_file = None
+    server_file = None
+    output_file_path = ''
     map_string = ''
     map_file = open(args.MapList, 'r').read()
     map_file = map_file.split('\n')
     size = len(map_file) - 1
-
     server_file_exists = False
 
     if args.ServerFile is not None:
@@ -54,30 +57,33 @@ def main():
         input()
         exit()
     elif server_file_exists:
-        final_map_file = open(args.ServerFile, 'r+')
+        output_file_path = f'{DIR}{OUT_DIR_PATH}{SERVER_FILE_COPY}' if args.copy else args.ServerFile
+        server_file = open(args.ServerFile, 'r+')
+        output_file = open(output_file_path, 'w+') if not output_file_path is args.ServerFile else server_file
     else:
         print('Creating directory and map list file if it does not exist.' if args.list else 'You have not specified a server file or set list file argument, defaulting to list file.')
         args.ServerFile = None
-        Path(f'{DIR}{MAP_LIST_DIR_PATH}').mkdir(parents=True, exist_ok=True)
-        final_map_file = open(f'{DIR}{MAP_LIST_DIR_PATH}{MAP_LIST_PATH}', 'w+')
+        Path(f'{DIR}{OUT_DIR_PATH}').mkdir(parents=True, exist_ok=True)
+        output_file_path = f'{DIR}{OUT_DIR_PATH}{MAP_LIST_FILE}'
+        output_file = open(output_file_path, 'w+')
     
-    if final_map_file is not None:
-        map_string = string_builder(args, random_map_list, maps, final_map_file)
-        final_map_file.seek(0)
-        final_map_file.write(map_string)
-        final_map_file.truncate()
-        print('New ', 'server file ' if not args.list and server_file_exists else 'map list ', 'generated! Find you new file here: ', args.ServerFile if not args.list and server_file_exists else f'{DIR}{MAP_LIST_DIR_PATH}{MAP_LIST_PATH}')
+    if output_file is not None:
+        map_string = string_builder(args, random_map_list, maps, server_file)
+        output_file.seek(0)
+        output_file.write(map_string)
+        output_file.truncate()
+        print('New ', 'server file ' if not args.list and server_file_exists else 'map list ', 'generated! Find you new file here: ', output_file_path)
     else:
         raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MW2MapScramblerPython')
 
-def string_builder(args, random_map_list: dict, map_list: dict, map_file: TextIOWrapper) -> str:
+def string_builder(args, random_map_list: dict, map_list: dict, server_file: TextIOWrapper) -> str:
     size = len(random_map_list) - 1
     file_slices = None
     maps = ''
     map_prefix = args.prefix if args.prefix is not None else ''
 
-    if args.ArgSliceChar is not None and args.ServerFile is not None:
-        file_slices = map_file.read().split(args.ArgSliceChar)
+    if args.ArgSliceChar is not None and server_file is not None:
+        file_slices = server_file.read().split(args.ArgSliceChar)
         maps += file_slices[0]
     elif args.PreArg is not None:
         maps += args.PreArg
@@ -92,7 +98,7 @@ def string_builder(args, random_map_list: dict, map_list: dict, map_file: TextIO
     if args.quotes:
         maps += '\"'
 
-    if args.ArgSliceChar is not None and args.ServerFile is not None:
+    if args.ArgSliceChar is not None and server_file is not None:
         maps += file_slices[2]
     elif args.PostArg is not None:
         maps += args.PostArg
