@@ -1,7 +1,7 @@
 # MW2MapScramblerPython
 
 This was written with the [IW4x](https://xlabs.dev/) project in mind. 
-# **DUE TO HOW THIS SCRIPT WORKS, IT IS RECOMMENDED THAT YOU DO THIS ON A COPY OF YOUR SERVER.CFG FILE**
+# **--SERVERFILE WILL OVERRIDE THE FILE YOU GIVE IT, SO IT IS RECOMMENDED THAT YOU DO THIS ON A COPY OF YOUR SERVER.CFG FILE**
 
   - [Requirements](#requirements)
   - [Arguments](#arguments)
