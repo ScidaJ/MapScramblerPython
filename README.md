@@ -8,7 +8,7 @@ This was written with the [IW4x](https://xlabs.dev/) project in mind.
   - [Map List Format](#map-list-format)
     - [Example](#example)
 
-It is a small tool to randomize the map list found in the server settings file. This was very annoying for me to do by hand as it could take upwards of 10 minutes each time. IW4x does not support automatic map list scrambling so I made it myself.
+This is a small tool to randomize the map list found in the server settings file. This was very annoying for me to do by hand as it could take upwards of 10 minutes each time. IW4x does not support automatic map list scrambling so I made it myself.
 
 Before using, please ensure that you have a map list that is in the proper format. There is a properly formatted list in this repository.
 
