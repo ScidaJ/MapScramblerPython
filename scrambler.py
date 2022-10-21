@@ -18,8 +18,8 @@ def main():
     parser.add_argument('--PreArg', help='Arguments that go before the map list. Spaces/New lines will not be added to the end.')
     parser.add_argument('--PostArg', help='Arguments that go after the map list. Spaces/New lines will not be added to the front.')
     parser.add_argument('--ArgSliceChar', help='Character to slice the server arguments by. Must be exactly 2 slice characters in server file, One directly before the map list, and one directly after. CANNOT be used with --PreArg or --PostArg.')
-    parser.add_argument('-c', '--copy', help='Saves scrambled server file to a copy instead of overriding given server file. Not to be used with -l.', action='store_true')
     parser.add_argument('-l', '--list', help='Enables output to a seperate list file instead of overwriting server file. Will be placed in \out\map_list.txt. Do not use with --ServerFile', action='store_true')
+    parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
     parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
     parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
     parser.add_argument('-v', '--verbose', help='Enables verbose output', action='store_true')
@@ -57,7 +57,7 @@ def main():
         input()
         exit()
     elif server_file_exists:
-        output_file_path = f'{DIR}{OUT_DIR_PATH}{SERVER_FILE_COPY}' if args.copy else args.ServerFile
+        output_file_path = f'{DIR}{OUT_DIR_PATH}{SERVER_FILE_COPY}' if not args.override else args.ServerFile
         server_file = open(args.ServerFile, 'r+')
         output_file = open(output_file_path, 'w+') if not output_file_path is args.ServerFile else server_file
     else:
@@ -110,6 +110,14 @@ def validate_args(args):
 
     if not exists(args.MapList):
         print('Your map file ', args.MapFile, ' does not exist. Exiting.')
+        valid = False
+
+    if args.override:
+        print('--override is set. Exit program with Ctrl + C if this is not correct, otherwise hit Enter.')
+        input()
+
+    if args.override and args.ServerFile is None:
+        print('--override provided with no --ServerFile, this is not allowed. Exiting.')
         valid = False
 
     if args.ArgSliceChar is not None and args.ServerFile is None:
