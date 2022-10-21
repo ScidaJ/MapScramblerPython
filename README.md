@@ -7,6 +7,9 @@ It is a small tool to randomize the map list found in the server settings file. 
 
 Before using, please ensure that you have a map list that is in the proper format. There is a properly formatted list in this repository.
 
+## Requirements
+ - Python 3.9 or greater
+
 ## Arguments
 
 | Argument         | Required           | Description                                                                                                                                                                                                                                              | Example                                                                                                                    |
