@@ -133,6 +133,7 @@ def validate_args(args):
         valid = False
     
     if not valid:
+        print('Press any button to exit.')
         input()
         exit()
 
