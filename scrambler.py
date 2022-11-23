@@ -18,6 +18,8 @@ def main():
     parser.add_argument('--PreArg', help='Arguments that go before the map list. Spaces/New lines will not be added to the end.')
     parser.add_argument('--PostArg', help='Arguments that go after the map list. Spaces/New lines will not be added to the front.')
     parser.add_argument('--ArgSliceChar', help='Character to slice the server arguments by. Must be exactly 2 slice characters in server file, One directly before the map list, and one directly after. CANNOT be used with --PreArg or --PostArg.')
+    parser.add_argument('--OutputDir', help='The directory where you would like to output the final copy. Not to be used with -o.')
+    parser.add_argument('--OutputFile', help='The name of the output file. Not to be used with -o.')
     parser.add_argument('-l', '--list', help='Enables output to a seperate list file instead of overwriting server file. Will be placed in \out\map_list.txt. Do not use with --ServerFile', action='store_true')
     parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
     parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
@@ -33,6 +35,7 @@ def main():
     output_file = None
     server_file = None
     output_file_path = ''
+    output_file_name = args.OutputFile if args.OutputFile is not None else SERVER_FILE_COPY
     map_string = ''
     map_file = open(args.MapList, 'r').read()
     map_file = map_file.split('\n')
@@ -57,7 +60,12 @@ def main():
         input()
         exit()
     elif server_file_exists:
-        output_file_path = f'{DIR}{OUT_DIR_PATH}{SERVER_FILE_COPY}' if not args.override else args.ServerFile
+        if args.OutputDir is not None:
+             output_file_path = f'{args.OutputDir}{output_file_name}'
+        elif not args.override:
+            output_file_path = f'{DIR}{OUT_DIR_PATH}{output_file_name}'
+        else:
+            output_file_path = args.ServerFile
         server_file = open(args.ServerFile, 'r+')
         output_file = open(output_file_path, 'w+') if not output_file_path is args.ServerFile else server_file
     else:
@@ -129,7 +137,15 @@ def validate_args(args):
         valid = False
 
     if args.list and args.ServerFile is not None:
-        print('--list set to true when ServerFile is provided. Do not use these together.')
+        print('--list set to true when ServerFile is provided. Do not use these together. Exiting.')
+        valid = False
+
+    if args.OutputDir is not None and args.override:
+        print('--OutputDir cannot be used with -o. Exiting.')
+        valid = False
+
+    if args.OutputFile is not None and args.override:
+        print('--OutputFile cannot be used with -o. Exiting.')
         valid = False
     
     if not valid:
