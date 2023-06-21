@@ -42,9 +42,6 @@ def main():
     size = len(map_file) - 1
     server_file_exists = False
 
-    if args.ServerFile is not None:
-        server_file_exists = exists(args.ServerFile)
-    
     for curr_map in map_file:
         curr_map = curr_map.split(',')
         maps[curr_map[1]] = curr_map[0]
@@ -54,6 +51,9 @@ def main():
         random_map_list[index] = curr_map[1]
     
     print('Maps have been scrambled, writing to ', 'server file' if args.list is None else 'list file')
+
+    if args.ServerFile is not None:
+        server_file_exists = exists(args.ServerFile)
     
     if args.ServerFile is not None and not server_file_exists:
         print('Your server file', args.ServerFile, 'does not exist. Check the file path.')
@@ -117,7 +117,7 @@ def validate_args(args):
     valid = True
 
     if not exists(args.MapList):
-        print('Your map file ', args.MapFile, ' does not exist. Exiting.')
+        print('Your map file {0} does not exist. Exiting.'.format(args.MapFile))
         valid = False
 
     if args.override:
