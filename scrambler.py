@@ -45,7 +45,7 @@ def main():
     map_filter = ingest_filter(args)
 
     #ingest_filter(args) will alter the final size of the map list, so it must be calculated after the filter is generated.
-    size = (len(map_file) - 1) if args.Filter == '' else ((len(map_file) - 1) - len(map_filter.split(',')))
+    size = (len(map_file) - 1) if map_filter == '' else ((len(map_file) - 1) - len(map_filter.split(',')))
 
     random_map_list_builder(map_filter, map_file, maps, random_map_list, size)
     
