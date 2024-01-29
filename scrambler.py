@@ -51,7 +51,7 @@ def main():
             index = random.randint(0, size)
         random_map_list[index] = curr_map[1]
     
-    print('Maps have been scrambled, writing to ', 'server file' if args.list is None else 'list file')
+    print('Maps have been scrambled, writing to', 'server file' if args.list is None else 'list file')
 
     if args.ServerFile is not None:
         server_file_exists = exists(args.ServerFile)
@@ -81,7 +81,7 @@ def main():
         output_file.seek(0)
         output_file.write(map_string)
         output_file.truncate()
-        print('New ', 'server file ' if not args.list and server_file_exists else 'map list ', 'generated! Find you new file here: ', output_file_path)
+        print('New', 'server file' if not args.list and server_file_exists else 'map list', 'generated! Find you new file here:', output_file_path, '\nThe first map is', random_map_list[0])
     else:
         raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MW2MapScramblerPython')
 
