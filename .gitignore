@@ -136,3 +136,6 @@ resources
 # Specified by developer
 out/*
 mw3_scramble.bat
+mw2_maps.txt
+mw3_maps.txt
+mw3_maps_configured.txt
