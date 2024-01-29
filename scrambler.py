@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--OutputFile', help='The name of the output file. Not to be used with -o.')
     parser.add_argument('--Three', help='Enables MW3 map category filtering. 🛑 WARNING 🛑 This command should only be used with the configured MW3 map file found in the repository.', action='store_true')
     parser.add_argument('--MapTypes', help='Provide single character lists of map types to exclude in shuffle. Only works in MW3 mode.', choices=['v', 'd', 's', 'p'], nargs='*', default=[])
+    parser.add_argument('--Filter', help='Provide a CSV list of maps or path to a file containing one to be filtered out of the scramble.', default='')
     parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
     parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
     parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
@@ -39,16 +40,14 @@ def main():
     output_file_name = args.OutputFile if args.OutputFile is not None else SERVER_FILE_COPY
     map_string = ''
     map_file = map_file_builder(args)
-    size = len(map_file) - 1
     server_file_exists = False
 
-    for curr_map in map_file:
-        curr_map = curr_map.split(',')
-        maps[curr_map[1]] = curr_map[0]
-        index = random.randint(0, size)
-        while index in random_map_list:
-            index = random.randint(0, size)
-        random_map_list[index] = curr_map[1]
+    map_filter = ingest_filter(args)
+
+    #ingest_filter(args) will alter the final size of the map list, so it must be calculated after the filter is generated.
+    size = (len(map_file) - 1) if args.Filter == '' else ((len(map_file) - 1) - len(map_filter.split(',')))
+
+    random_map_list_builder(map_filter, map_file, maps, random_map_list, size)
     
     print('Maps have been scrambled, writing to', 'list file' if args.ServerFile is None else 'server file')
 
@@ -96,6 +95,23 @@ def map_file_builder(args):
                 list_seg = list_seg.split('\n')
                 map_list_filtered = map_list_filtered + list_seg[1:]
         return map_list_filtered        
+
+def random_map_list_builder(map_filter, map_file, maps, random_map_list, size):
+    for curr_map in map_file:
+        curr_map = curr_map.split(',')
+        if curr_map[1] not in map_filter:
+            maps[curr_map[1]] = curr_map[0]
+            index = random.randint(0, size)
+            while index in random_map_list:
+                index = random.randint(0, size)
+            random_map_list[index] = curr_map[1]
+
+def ingest_filter(args):
+    if len(args.Filter) != 0 and '.txt' in args.Filter[(len(args.Filter) - 4):]:
+            map_filter = open(args.Filter, 'r').read()
+            return map_filter
+    else:
+        return args.Filter
 
 def string_builder(args, random_map_list: dict, map_list: dict, server_file: TextIOWrapper) -> str:
     size = len(random_map_list) - 1
@@ -161,6 +177,10 @@ def validate_args(args):
         print('You have selected all map types. This would result in an empty map list. Please choose at least one map type.')
         valid = False
     
+    if '.txt' in args.Filter[(len(args.Filter) - 4):] and not exists(args.Filter):
+        print('The filter file you provided does not exist.')
+        valid = False
+
     if not valid:
         print('Press Enter to exit.')
         input()
