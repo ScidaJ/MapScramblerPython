@@ -22,7 +22,6 @@ def main():
     parser.add_argument('--OutputFile', help='The name of the output file. Not to be used with -o.')
     parser.add_argument('--Three', help='Enables MW3 map category filtering. 🛑 WARNING 🛑 This command should only be used with the configured MW3 map file found in the repository.', action='store_true')
     parser.add_argument('--MapTypes', help='Provide single character lists of map types to exclude in shuffle. Only works in MW3 mode.', choices=['v', 'd', 's', 'p'], nargs='*', default=[])
-    parser.add_argument('-l', '--list', help='Enables output to a seperate list file instead of overwriting server file. Will be placed in \out\map_list.txt. Do not use with --ServerFile', action='store_true')
     parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
     parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
     parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
@@ -51,7 +50,7 @@ def main():
             index = random.randint(0, size)
         random_map_list[index] = curr_map[1]
     
-    print('Maps have been scrambled, writing to', 'server file' if args.list is None else 'list file')
+    print('Maps have been scrambled, writing to', 'list file' if args.ServerFile is None else 'server file')
 
     if args.ServerFile is not None:
         server_file_exists = exists(args.ServerFile)
@@ -70,7 +69,7 @@ def main():
         server_file = open(args.ServerFile, 'r+')
         output_file = open(output_file_path, 'w+') if not output_file_path is args.ServerFile else server_file
     else:
-        print('Creating directory and map list file if it does not exist.' if args.list else 'You have not specified a server file or set list file argument, defaulting to list file.')
+        print('Creating directory and map list file if it does not exist.')
         args.ServerFile = None
         Path(f'{DIR}{OUT_DIR_PATH}').mkdir(parents=True, exist_ok=True)
         output_file_path = f'{DIR}{OUT_DIR_PATH}{MAP_LIST_FILE}'
@@ -81,7 +80,7 @@ def main():
         output_file.seek(0)
         output_file.write(map_string)
         output_file.truncate()
-        print('New', 'server file' if not args.list and server_file_exists else 'map list', 'generated! Find you new file here:', output_file_path, '\nThe first map is', random_map_list[0])
+        print('New', 'server file' if server_file_exists else 'map list', 'generated! Find your new file here:', output_file_path, '\nThe first map is', random_map_list[0])
     else:
         raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MW2MapScramblerPython')
 
@@ -148,10 +147,6 @@ def validate_args(args):
 
     if args.ArgSliceChar is not None and args.ServerFile is not None and (args.PreArg is not None or args.PostArg is not None):
         print('ArgSliceChar, ServerFile, PreArg or PostArg all defined. This is not allowed. Exiting.')
-        valid = False
-
-    if args.list and args.ServerFile is not None:
-        print('--list set to true when ServerFile is provided. Do not use these together. Exiting.')
         valid = False
 
     if args.OutputDir is not None and args.override:
