@@ -1,0 +1,13 @@
+{
+    "MD033": {
+        "allowed_elements": [
+            "ul",
+            "li"
+        ]
+    },
+    "MD013": {
+        "code_blocks": false,
+        "tables": false,
+        "headings": false
+    }
+}

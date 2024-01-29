@@ -12,7 +12,7 @@ MAP_LIST_FILE = '\maps.txt'
 SERVER_FILE_COPY = '\server_copy.cfg'
 
 def main(): 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog='scrambler.py')
     parser.add_argument('MapList', help='Path to the map list that you want to use with the scrambler. Will not create if it does not exist.')
     parser.add_argument('--ServerFile', help='Path to the server startup file or the file which contains the map list. Will not create if it does not exist. Do not use with --list.')
     parser.add_argument('--PreArg', help='Arguments that go before the map list. Spaces/New lines will not be added to the end.')
@@ -20,12 +20,14 @@ def main():
     parser.add_argument('--ArgSliceChar', help='Character to slice the server arguments by. Must be exactly 2 slice characters in server file, One directly before the map list, and one directly after. CANNOT be used with --PreArg or --PostArg.')
     parser.add_argument('--OutputDir', help='The directory where you would like to output the final copy. Not to be used with -o.')
     parser.add_argument('--OutputFile', help='The name of the output file. Not to be used with -o.')
+    parser.add_argument('--Three', help='Enables MW3 map category filtering. 🛑 WARNING 🛑 This command should only be used with the configured MW3 map file found in the repository.', action='store_true')
+    parser.add_argument('--MapTypes', help='Provide single character lists of map types to exclude in shuffle. Only works in MW3 mode.', choices=['v', 'd', 's', 'p'], nargs='*', default=[])
     parser.add_argument('-l', '--list', help='Enables output to a seperate list file instead of overwriting server file. Will be placed in \out\map_list.txt. Do not use with --ServerFile', action='store_true')
     parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
     parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
     parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
-    parser.add_argument('-v', '--verbose', help='Enables verbose output', action='store_true')
-
+    parser.add_argument('-v', '--verbose', help='Enables verbose output.', action='store_true')
+    
     args = parser.parse_args()
 
     validate_args(args)
@@ -37,8 +39,7 @@ def main():
     output_file_path = ''
     output_file_name = args.OutputFile if args.OutputFile is not None else SERVER_FILE_COPY
     map_string = ''
-    map_file = open(args.MapList, 'r').read()
-    map_file = map_file.split('\n')
+    map_file = map_file_builder(args)
     size = len(map_file) - 1
     server_file_exists = False
 
@@ -84,6 +85,19 @@ def main():
     else:
         raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MW2MapScramblerPython')
 
+def map_file_builder(args):
+    if not args.Three:
+        return open(args.MapList, 'r').read().split('\n')
+    else:
+        map_list_filtered = []
+        map_list = open(args.MapList, 'r').read()
+        map_list = map_list.split('%')
+        for list_seg in map_list:
+            if args.MapTypes is not None and list_seg[0] not in args.MapTypes:
+                list_seg = list_seg.split('\n')
+                map_list_filtered = map_list_filtered + list_seg[1:]
+        return map_list_filtered        
+
 def string_builder(args, random_map_list: dict, map_list: dict, server_file: TextIOWrapper) -> str:
     size = len(random_map_list) - 1
     file_slices = None
@@ -117,7 +131,7 @@ def validate_args(args):
     valid = True
 
     if not exists(args.MapList):
-        print('Your map file {0} does not exist. Exiting.'.format(args.MapFile))
+        print('Your map file {0} does not exist. Exiting.'.format(args.MapList))
         valid = False
 
     if args.override:
@@ -147,9 +161,13 @@ def validate_args(args):
     if args.OutputFile is not None and args.override:
         print('--OutputFile cannot be used with -o. Exiting.')
         valid = False
+
+    if args.Three and len(args.MapTypes) == 4:
+        print('You have selected all map types. This would result in an empty map list. Please choose at least one map type.')
+        valid = False
     
     if not valid:
-        print('Press any button to exit.')
+        print('Press Enter to exit.')
         input()
         exit()
 
