@@ -12,23 +12,8 @@ MAP_LIST_FILE = '\maps.txt'
 SERVER_FILE_COPY = '\server_copy.cfg'
 
 def main(): 
-    parser = argparse.ArgumentParser(prog='scrambler.py')
-    parser.add_argument('MapList', help='Path to the map list that you want to use with the scrambler. Will not create if it does not exist.')
-    parser.add_argument('--ServerFile', help='Path to the server startup file or the file which contains the map list. Will not create if it does not exist. Do not use with --list.')
-    parser.add_argument('--PreArg', help='Arguments that go before the map list. Spaces/New lines will not be added to the end.')
-    parser.add_argument('--PostArg', help='Arguments that go after the map list. Spaces/New lines will not be added to the front.')
-    parser.add_argument('--ArgSliceChar', help='Character to slice the server arguments by. Must be exactly 2 slice characters in server file, One directly before the map list, and one directly after. CANNOT be used with --PreArg or --PostArg.')
-    parser.add_argument('--OutputDir', help='The directory where you would like to output the final copy. Not to be used with -o.')
-    parser.add_argument('--OutputFile', help='The name of the output file. Not to be used with -o.')
-    parser.add_argument('--Three', help='Enables MW3 map category filtering. 🛑 WARNING 🛑 This command should only be used with the configured MW3 map file found in the repository.', action='store_true')
-    parser.add_argument('--MapTypes', help='Provide single character lists of map types to exclude in shuffle. Only works in MW3 mode.', choices=['v', 'd', 's', 'p'], nargs='*', default=[])
-    parser.add_argument('--Filter', help='Provide a CSV list of maps or path to a file containing one to be filtered out of the scramble.', default='')
-    parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
-    parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
-    parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
-    parser.add_argument('-v', '--verbose', help='Enables verbose output.', action='store_true')
     
-    args = parser.parse_args()
+    args = prase_args()
 
     validate_args(args)
 
@@ -39,7 +24,7 @@ def main():
     output_file_path = ''
     output_file_name = args.OutputFile if args.OutputFile is not None else SERVER_FILE_COPY
     map_string = ''
-    map_file = map_file_builder(args)
+    map_file = Path(args.MapList).read_text().split('\n')
     server_file_exists = False
 
     map_filter = ingest_filter(args)
@@ -81,20 +66,24 @@ def main():
         output_file.truncate()
         print('New', 'server file' if server_file_exists else 'map list', 'generated! Find your new file here:', output_file_path, '\nThe first map is', random_map_list[0])
     else:
-        raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MW2MapScramblerPython')
+        raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MapScramblerPython')
 
-def map_file_builder(args):
-    if not args.Three:
-        return open(args.MapList, 'r').read().split('\n')
-    else:
-        map_list_filtered = []
-        map_list = open(args.MapList, 'r').read()
-        map_list = map_list.split('%')
-        for list_seg in map_list:
-            if args.MapTypes is not None and list_seg[0] not in args.MapTypes:
-                list_seg = list_seg.split('\n')
-                map_list_filtered = map_list_filtered + list_seg[1:]
-        return map_list_filtered        
+def prase_args(argv):
+    parser = argparse.ArgumentParser(prog='scrambler.py')
+    parser.add_argument('MapList', help='Path to the map list that you want to use with the scrambler. Will not create if it does not exist.')
+    parser.add_argument('--ServerFile', help='Path to the server startup file or the file which contains the map list. Will not create if it does not exist. Do not use with --list.')
+    parser.add_argument('--PreArg', help='Arguments that go before the map list. Spaces/New lines will not be added to the end.')
+    parser.add_argument('--PostArg', help='Arguments that go after the map list. Spaces/New lines will not be added to the front.')
+    parser.add_argument('--ArgSliceChar', help='Character to slice the server arguments by. Must be exactly 2 slice characters in server file, One directly before the map list, and one directly after. CANNOT be used with --PreArg or --PostArg.')
+    parser.add_argument('--OutputDir', help='The directory where you would like to output the final copy. Not to be used with -o.')
+    parser.add_argument('--OutputFile', help='The name of the output file. Not to be used with -o.')
+    parser.add_argument('--Filter', help='Provide a CSV list of maps or path to a file containing one to be filtered out of the scramble.', default='')
+    parser.add_argument('-o', '--override', help='Overwrites original server.cfg with scrambled version. Only use this if you know what you are doing. Not to be used with -l.', action='store_true')
+    parser.add_argument('-p', '--prefix', help='Prefix for map names. Space will not be added if they exist. E.g. mp [mapName]')
+    parser.add_argument('-q', '--quotes', help='Encapsulates the map list in quotes.', action='store_true')
+    parser.add_argument('-v', '--verbose', help='Enables verbose output.', action='store_true')
+
+    return parser.parse_args(argv)
 
 def random_map_list_builder(map_filter, map_file, maps, random_map_list, size):
     for curr_map in map_file:
@@ -108,7 +97,7 @@ def random_map_list_builder(map_filter, map_file, maps, random_map_list, size):
 
 def ingest_filter(args):
     if len(args.Filter) != 0 and '.txt' in args.Filter[(len(args.Filter) - 4):]:
-            map_filter = open(args.Filter, 'r').read()
+            map_filter = Path(args.Filter).read_text()
             return map_filter
     else:
         return args.Filter
@@ -174,11 +163,11 @@ def validate_args(args):
         valid = False
 
     if args.Three and len(args.MapTypes) == 4:
-        print('You have selected all map types. This would result in an empty map list. Please choose at least one map type.')
+        print('You have selected all map types. This would result in an empty map list. Please remove at least one map type from your filter. Exiting.')
         valid = False
     
     if '.txt' in args.Filter[(len(args.Filter) - 4):] and not exists(args.Filter):
-        print('The filter file you provided does not exist.')
+        print('The filter file you provided does not exist. Exiting.')
         valid = False
 
     if not valid:
