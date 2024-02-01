@@ -20,7 +20,7 @@ as templates.
 
 ![image](./images/Usage.png)
 
-`python scrambler.py ./mw3_maps_configured.txt --Three --MapTypes "s" -p "mp "`
+`python scrambler.py "./example/Map Lists/example_mw3_maps.txt" --Filter "./example/Map Lists/example_filter.txt" -p "map "`
 
 ## Requirements
 
@@ -37,9 +37,7 @@ as templates.
 | `--ArgSliceChar` | :x: | An alternative to `--PreArg` and `--PostArg`, place a character in your server.cfg file directly before and after the map list. This **CANNOT** be used with `--PreArg` **OR** `--PostArg`| `--ArgSliceChar "$"`|
 | `OutputDir` | :x:| Path to the desired output directory. ||
 | `OutputFile` | :x: | Path to desired output file if different from default: `./out/maps.txt`||
-| `--Three`| :x: | Enables map list filtering for Modern Warfare 3. **🛑 WARNING 🛑** This command should only be used with the configured MW3 map file found in the repository or one configured like it. ||
-| `--MapTypes`| :x: | To be used with `--Thee`. Specifies map categories to filter out of scrambler.<ul><li> `v` Vanilla Maps</li><li>`s` 1v1/2v2/3v3 Sized Maps(Rust not included)</li><li>`d` Non-short DLC maps</li><li>`p` Plutonium Maps</li> ||
-| `--Filter` | :x: | A comma separated list or a path to a file containing maps to be filtered out of the scrambler. Should not be used with `--Three` and `--MapTypes` to avoid confusion. Example provided in `example/`||
+| `--Filter` | :x: | A comma separated list or a path to a file containing maps to be filtered out of the scrambler. Example provided in `example/`||
 | `-o`, `--override`   | :x: | Overrides the original server.cfg with the new one. Only use this if you know what you are doing. ||
 | `-p`, `--prefix` | :x: | Prefix for map names if the game requires it(e.g. mp [map name]). Spaces will not be added to the end of this string.| `-p "mp "`|
 | `-q`, `--quotes` | :x: | Encapsulates the map list in quotes.||

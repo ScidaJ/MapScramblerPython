@@ -68,7 +68,7 @@ def main():
     else:
         raise Exception('final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MapScramblerPython')
 
-def prase_args(argv):
+def prase_args(argv = None):
     parser = argparse.ArgumentParser(prog='scrambler.py')
     parser.add_argument('MapList', help='Path to the map list that you want to use with the scrambler. Will not create if it does not exist.')
     parser.add_argument('--ServerFile', help='Path to the server startup file or the file which contains the map list. Will not create if it does not exist. Do not use with --list.')
@@ -160,10 +160,6 @@ def validate_args(args):
 
     if args.OutputFile is not None and args.override:
         print('--OutputFile cannot be used with -o. Exiting.')
-        valid = False
-
-    if args.Three and len(args.MapTypes) == 4:
-        print('You have selected all map types. This would result in an empty map list. Please remove at least one map type from your filter. Exiting.')
         valid = False
     
     if '.txt' in args.Filter[(len(args.Filter) - 4):] and not exists(args.Filter):
