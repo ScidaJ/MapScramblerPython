@@ -35,8 +35,8 @@ as templates.
 | `--PreArg`       | :x: | Arguments that go before the map list. Note that spaces or new lines at the end will not be added by the script, so they must be present in the string given.                                                                                            | ```--PreArg "set sv_hostname \"Game Server\" set g_gametype \"war\" set sv_maprotation "```|
 | `--PostArg` | :x: | Arguments that go after the map list. Note that spaces or new lines at the beginning will not be added by the script, so they must be present in the string given.| See `--PreArg` example.|
 | `--ArgSliceChar` | :x: | An alternative to `--PreArg` and `--PostArg`, place a character in your server.cfg file directly before and after the map list. This **CANNOT** be used with `--PreArg` **OR** `--PostArg`| `--ArgSliceChar "$"`|
-| `OutputDir` | :x:| Path to the desired output directory. ||
-| `OutputFile` | :x: | Path to desired output file if different from default: `./out/maps.txt`||
+| `--OutputDir` | :x:| Path to the desired output directory. ||
+| `--OutputFile` | :x: | Path to desired output file if different from default: `./out/maps.txt`||
 | `--Filter` | :x: | A comma separated list or a path to a file containing maps to be filtered out of the scrambler. Example provided in `example/`||
 | `-o`, `--override`   | :x: | Overrides the original server.cfg with the new one. Only use this if you know what you are doing. ||
 | `-p`, `--prefix` | :x: | Prefix for map names if the game requires it(e.g. mp [map name]). Spaces will not be added to the end of this string.| `-p "mp "`|
