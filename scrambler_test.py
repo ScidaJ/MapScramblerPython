@@ -3,7 +3,6 @@ from pathlib import Path
 import scrambler
 
 MAP_LIST = "./test/map_list_test.txt"
-MAP_LIST_SIZE = 6
 FILTER = "./test/map_list_filter_test.txt"
 
 
@@ -23,13 +22,53 @@ class TestScramblerFunctions(unittest.TestCase):
         result = scrambler.ingest_filter(args)
         self.assertEqual(result, expected)
 
-    def test_random_map_list_builder_no_filter(self):
+    def test_apply_filter_empty(self):
         my_argv = [MAP_LIST]
+        map_list = [
+            "dmap_1,dMap 1",
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "vmap1,vmap1",
+            "pmap_1,pmap 1",
+            "pmap_2,pmap 2",
+        ]
+        expected = [
+            "dmap_1,dMap 1",
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "vmap1,vmap1",
+            "pmap_1,pmap 1",
+            "pmap_2,pmap 2",
+        ]
         args = scrambler.prase_args(my_argv)
-        map_file = Path(MAP_LIST).read_text().split("\n")
-        maps = {}
-        random_map_list = {}
-        maps_expected = {
+        filter = scrambler.ingest_filter(args)
+        scrambler.apply_filter(filter, map_list)
+        self.assertEqual(map_list, expected)
+
+    def test_apply_filter(self):
+        my_argv = [MAP_LIST, "--Filter", "dMap 1,vmap1,pmap 1"]
+        map_list = [
+            "dmap_1,dMap 1",
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "vmap1,vmap1",
+            "pmap_1,pmap 1",
+            "pmap_2,pmap 2",
+        ]
+        expected = [
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "pmap_2,pmap 2",
+        ]
+        args = scrambler.prase_args(my_argv)
+        filter = scrambler.ingest_filter(args)
+        scrambler.apply_filter(filter, map_list)
+        self.assertEqual(map_list, expected)
+
+    def test_random_map_list_builder_no_filter(self):
+        map_dict = {}
+        random_map_dict = {}
+        expected = {
             "dMap 1": "dmap_1",
             "sMap 2": "smap_2",
             "smap_3": "sMap_3",
@@ -37,20 +76,32 @@ class TestScramblerFunctions(unittest.TestCase):
             "pmap 1": "pmap_1",
             "pmap 2": "pmap_2",
         }
-        scrambler.random_map_list_builder(
-            "", map_file, maps, random_map_list, MAP_LIST_SIZE
-        )
-        self.assertDictEqual(maps, maps_expected)
-        self.assertEqual(len(maps), max(list(random_map_list.keys())) + 1)
+        map_list = Path(MAP_LIST).read_text().split("\n")
+        scrambler.apply_filter("", map_list)
+        scrambler.random_map_list_builder(map_list, map_dict, random_map_dict)
+        self.assertDictEqual(map_dict, expected)
+        self.assertEqual(len(map_dict), max(list(random_map_dict.keys())) + 1)
 
     def test_random_map_list_builder_filters(self):
         my_argv = [MAP_LIST, "--Filter", "dMap 1,vmap1,pmap 1"]
+        map_list = [
+            "dmap_1,dMap 1",
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "vmap1,vmap1",
+            "pmap_1,pmap 1",
+            "pmap_2,pmap 2",
+        ]
+        expected = {
+            "sMap 2": "smap_2",
+            "smap_3": "sMap_3",
+            "pmap 2": "pmap_2",
+        }
+        map_dict = {}
+        random_map_dict = {}
         args = scrambler.prase_args(my_argv)
-        filter = ["dMap 1", "vmap1", "pmap 1"]
-        map_file = Path(MAP_LIST).read_text().split("\n")
-        maps = {}
-        random_map_list = {}
-        maps_expected = {"sMap 2": "smap_2", "smap_3": "sMap_3", "pmap 2": "pmap_2"}
-        scrambler.random_map_list_builder(filter, map_file, maps, random_map_list, 3)
-        self.assertEqual(len(maps), max(list(random_map_list.keys())) + 1)
-        self.assertDictEqual(maps, maps_expected)
+        filter = scrambler.ingest_filter(args)
+        scrambler.apply_filter(filter, map_list)
+        scrambler.random_map_list_builder(map_list, map_dict, random_map_dict)
+        self.assertEqual(len(map_dict), max(list(random_map_dict.keys())) + 1)
+        self.assertDictEqual(map_dict, expected)

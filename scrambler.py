@@ -1,5 +1,6 @@
 import argparse
 import random
+import multiprocessing
 from io import TextIOWrapper
 from os import getcwd
 from os.path import exists
@@ -18,8 +19,8 @@ def main():
 
     validate_args(args)
 
-    maps = {}
-    random_map_list = {}
+    map_dict = {}
+    random_map_dict = {}
     output_file = None
     server_file = None
     output_file_path = ""
@@ -27,19 +28,13 @@ def main():
         args.OutputFile if args.OutputFile is not None else SERVER_FILE_COPY
     )
     map_string = ""
-    map_file = Path(args.MapList).read_text().split("\n")
+    map_list = Path(args.MapList).read_text().split("\n")
     server_file_exists = False
 
     map_filter = ingest_filter(args)
+    apply_filter(map_filter, map_list)
 
-    # ingest_filter(args) will alter the final size of the map list, so it must be calculated after the filter is generated.
-    size = (
-        len(map_file)
-        if map_filter == ""
-        else (len(map_file) - len(map_filter.split(",")))
-    )
-
-    random_map_list_builder(map_filter, map_file, maps, random_map_list, size)
+    random_map_list_builder(map_list, map_dict, random_map_dict)
 
     print(
         "Maps have been scrambled, writing to",
@@ -76,7 +71,7 @@ def main():
         output_file = open(output_file_path, "w+")
 
     if output_file is not None:
-        map_string = string_builder(args, random_map_list, maps, server_file)
+        map_string = string_builder(args, map_dict, random_map_dict, server_file)
         output_file.seek(0)
         output_file.write(map_string)
         output_file.truncate()
@@ -86,7 +81,7 @@ def main():
             "generated! Find your new file here:",
             output_file_path,
             "\nThe first map is",
-            random_map_list[0],
+            random_map_dict[0],
         )
     else:
         raise Exception(
@@ -152,17 +147,17 @@ def prase_args(argv=None):
     return parser.parse_args(argv)
 
 
-def random_map_list_builder(map_filter, map_file, maps, random_map_list, size):
-    for curr_map in map_file:
+def random_map_list_builder(map_list, map_dict, random_map_list):
+    size = len(map_list)
+    for curr_map in map_list:
         curr_map = curr_map.split(",")
-        if curr_map[1] not in map_filter:
-            maps[curr_map[1]] = curr_map[0]
+        map_dict[curr_map[1]] = curr_map[0]
+        index = random.randrange(0, size)
+        while (
+            index in random_map_list
+        ):  # This can result in an infinte loop if size is not calculated correctly. Will catch in future
             index = random.randrange(0, size)
-            while (
-                index in random_map_list
-            ):  # This can result in an infinte loop if size is not calculated correctly. Will catch in future
-                index = random.randrange(0, size)
-            random_map_list[index] = curr_map[1]
+        random_map_list[index] = curr_map[1]
 
 
 def ingest_filter(args):
@@ -173,10 +168,20 @@ def ingest_filter(args):
         return args.Filter
 
 
+def apply_filter(filter, map_list):
+    filter = filter.split(",")
+    map_list_copy = map_list[:]
+    for map in filter:
+        for map_obj in map_list_copy:
+            map_name = map_obj.split(",")[1]
+            if map == map_name:
+                map_list.remove(map_obj)
+
+
 def string_builder(
-    args, random_map_list: dict, map_list: dict, server_file: TextIOWrapper
+    args, map_dict: dict, random_map_dict: dict, server_file: TextIOWrapper
 ) -> str:
-    size = len(random_map_list) - 1
+    size = len(random_map_dict) - 1
     file_slices = None
     maps = ""
     map_prefix = args.prefix if args.prefix is not None else ""
@@ -192,7 +197,7 @@ def string_builder(
 
     for i in range(size):
         next_map = (
-            map_prefix + map_list[random_map_list[i]] + (" " if i < size - 1 else "")
+            map_prefix + map_dict[random_map_dict[i]] + (" " if i < size - 1 else "")
         )
         maps = "".join((maps, next_map))
 
@@ -259,4 +264,13 @@ def validate_args(args):
 
 
 if __name__ == "__main__":
-    main()
+    p = multiprocessing.Process(target=main)
+    p.start()
+    p.join(10)
+
+    if p.is_alive():
+        print(
+            "Scrambler stuck. Please double check that all of your files are valid. Press Enter to exit."
+        )
+
+        p.terminate()
