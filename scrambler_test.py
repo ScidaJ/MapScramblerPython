@@ -68,6 +68,27 @@ class TestApplyFilter(unittest.TestCase):
         scrambler.apply_filter(filter, map_list)
         self.assertEqual(map_list, expected)
 
+    def test_filter_map_not_in_list(self):
+        my_argv = [MAP_LIST, "--Filter", "dMap 1,Downturn,pmap 1"]
+        map_list = [
+            "dmap_1,dMap 1",
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "vmap1,vmap1",
+            "pmap_1,pmap 1",
+            "pmap_2,pmap 2",
+        ]
+        expected = [
+            "smap_2,sMap 2",
+            "sMap_3,smap_3",
+            "vmap1,vmap1",
+            "pmap_2,pmap 2",
+        ]
+        args = scrambler.prase_args(my_argv)
+        filter = scrambler.ingest_filter(args)
+        scrambler.apply_filter(filter, map_list)
+        self.assertEqual(map_list, expected)
+
 
 class TestRandomMapListBuilder(unittest.TestCase):
 
