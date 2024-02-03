@@ -50,7 +50,7 @@ class TestScramblerFunctions(unittest.TestCase):
         map_file = Path(MAP_LIST).read_text().split("\n")
         maps = {}
         random_map_list = {}
-        maps_expected = {"sMap 2": "smap_2", "smap_3": "sMap_3", "pmap 2": "pmap_2"}
+        maps_expected = {"sMap 2": "smap_2", "smap_3": "sMap_3", "pmap ": "pmap_2"}
         scrambler.random_map_list_builder(filter, map_file, maps, random_map_list, 2)
         self.assertEqual(len(maps), max(list(random_map_list.keys())) + 1)
         self.assertDictEqual(maps, maps_expected)
