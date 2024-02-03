@@ -1,1 +1,1 @@
-dMap 1,vmap1,pmap 1
+dMap 1,smap_3,pmap 1

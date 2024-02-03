@@ -1,6 +1,6 @@
-dmap_1,Map 1
-smap_2,Map 2
-sMap_3,map 3
+dmap_1,dMap 1
+smap_2,sMap 2
+sMap_3,smap_3
 vmap1,vmap1
 pmap_1,pmap 1
 pmap_2,pmap 2

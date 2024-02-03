@@ -34,9 +34,9 @@ def main():
 
     # ingest_filter(args) will alter the final size of the map list, so it must be calculated after the filter is generated.
     size = (
-        (len(map_file) - 1)
+        len(map_file)
         if map_filter == ""
-        else ((len(map_file) - 1) - len(map_filter.split(",")))
+        else (len(map_file) - len(map_filter.split(",")))
     )
 
     random_map_list_builder(map_filter, map_file, maps, random_map_list, size)
@@ -157,9 +157,11 @@ def random_map_list_builder(map_filter, map_file, maps, random_map_list, size):
         curr_map = curr_map.split(",")
         if curr_map[1] not in map_filter:
             maps[curr_map[1]] = curr_map[0]
-            index = random.randint(0, size)
-            while index in random_map_list:
-                index = random.randint(0, size)
+            index = random.randrange(0, size)
+            while (
+                index in random_map_list
+            ):  # This can result in an infinte loop if size is not calculated correctly. Will catch in future
+                index = random.randrange(0, size)
             random_map_list[index] = curr_map[1]
 
 
