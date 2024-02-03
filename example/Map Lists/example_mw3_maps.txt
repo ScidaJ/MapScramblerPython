@@ -3,7 +3,6 @@ mp_bootleg,Bootleg
 mp_bravo,Mission
 mp_carbon,Carbon
 mp_dome,Dome
-mp_exchange,Downturn
 mp_hardhat,Hardhat
 mp_interchange,Interchange
 mp_lambeth,Fallen
