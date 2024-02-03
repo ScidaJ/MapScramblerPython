@@ -21,8 +21,8 @@ def main():
 
     map_dict = {}
     random_map_dict = {}
-    output_file = None
     server_file = None
+    output_file = None
     output_file_path = ""
     output_file_name = (
         args.OutputFile if args.OutputFile is not None else SERVER_FILE_COPY
@@ -83,6 +83,7 @@ def main():
             "\nThe first map is",
             random_map_dict[0],
         )
+        output_file.close()
     else:
         raise Exception(
             "final_map_file not opened. Contact dev for assistance here https://github.com/ScidaJ/MapScramblerPython"
@@ -153,9 +154,7 @@ def random_map_list_builder(map_list, map_dict, random_map_list):
         curr_map = curr_map.split(",")
         map_dict[curr_map[1]] = curr_map[0]
         index = random.randrange(0, size)
-        while (
-            index in random_map_list
-        ):  # This can result in an infinte loop if size is not calculated correctly. Will catch in future
+        while index in random_map_list:
             index = random.randrange(0, size)
         random_map_list[index] = curr_map[1]
 
