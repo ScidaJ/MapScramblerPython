@@ -30,9 +30,9 @@ as templates.
 
 | Argument | Required | Description | Example |
 | - | - | - | - |
-| `MapFile` | :heavy_check_mark: | Path to the map file. Can be relative. Goes right after script file name. | ```python scrambler.py /c/gameserver/maps.txt -l -p "mp "```, ```python scrambler.py "C:\gameserver\maps.txt" -l -p "map "``` |
-| `--ServerFile`   | :x: | Path to server.cfg file. Can be relative. | `--ServerFile /c/gameserver/server.cfg`, `--ServerFile "C:\gameserver\server.cfg"` |
-| `--PreArg`       | :x: | Arguments that go before the map list. Note that spaces or new lines at the end will not be added by the script, so they must be present in the string given.                                                                                            | ```--PreArg "set sv_hostname \"Game Server\" set g_gametype \"war\" set sv_maprotation "```|
+| `MapFile` | :heavy_check_mark: | Path to the map file. | ```python scrambler.py /c/gameserver/maps.txt -l -p "mp "```, ```python scrambler.py "C:\gameserver\maps.txt" -l -p "map "``` |
+| `--ServerFile`   | :x: | Path to server.cfg file. | `--ServerFile /c/gameserver/server.cfg`, `--ServerFile "C:\gameserver\server.cfg"` |
+| `--PreArg`       | :x: | Arguments that go before the map list. Note that spaces or new lines at the end will not be added by the script, so they must be present in the string given. | ```--PreArg "set sv_hostname \"Game Server\" set g_gametype \"war\" set sv_maprotation "```|
 | `--PostArg` | :x: | Arguments that go after the map list. Note that spaces or new lines at the beginning will not be added by the script, so they must be present in the string given.| See `--PreArg` example.|
 | `--ArgSliceChar` | :x: | An alternative to `--PreArg` and `--PostArg`, place a character in your server.cfg file directly before and after the map list. This **CANNOT** be used with `--PreArg` **OR** `--PostArg`| `--ArgSliceChar "$"`|
 | `--OutputDir` | :x:| Path to the desired output directory. ||
